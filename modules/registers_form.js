@@ -1,19 +1,24 @@
+import {isValid} from './support.js';
+
 export function onBtnRegisterFormHandler(currentDate, evt) {
-  const workForm = evt.target.form;
-  const userData = JSON.parse(localStorage.getItem('userData') );
-  let workHours = workForm.querySelector('.item_checked').textContent || workForm.querySelector('.input__hour' || alert('Inserire le ore di lavoro') );
-  const dataForSaveInDatabase = new CreateObjectForDatabase(workHours, currentDate, workForm);
-  //putScheduleInDatabase(userData, dataForSaveInDatabase);
-  //saveDataInLocalStorage(dataForSaveInDatabase, currentDate);
-  console.log(dataForSaveInDatabase);
+  const workForm = evt.target.form,
+        building = workForm.building.value,
+        description = workForm.description.value,
+        userData = JSON.parse(localStorage.getItem('userData') ),
+        dataForSaveInDatabase = new CreateObjectForDatabase(currentDate, building, description);
+
+  if(!isValid(building)) {alert('Inserire il nome di cantiere valido'); return}
+  if(!isValid(description, /\w{15,}/)) {alert('Inserire il lavoro svolto valido'); return}
+
+ //putScheduleInDatabase(userData, dataForSaveInDatabase);
+ saveDataInLocalStorage(dataForSaveInDatabase, currentDate);
 }
 
-function CreateObjectForDatabase(workHours, currentDate, form) {
+function CreateObjectForDatabase(currentDate, building, description) {
   this[`${currentDate}`] =
       {
-        workHours,
-        building: form.building.value,
-        description: form.description.value
+        building,
+        description
       };
 }
 
@@ -38,10 +43,9 @@ function authWithEmailAndPassword(userData) {
 }
 
 const putScheduleInDatabase = (userData, dataForSaveInDatabase) => {
-  console.log(11);
-  authWithEmailAndPassword(userData)
-    .catch(err => console.log(err) )
-    .then(idToken => {
+   authWithEmailAndPassword(userData)
+     .then(idToken => {
+
       //if (!idToken) { return console.log(Error.message); }
       
       fetch(`https://la-sceda-di-lavoro-default-rtdb.firebaseio.com/rapportinoBorys.json?auth=${idToken}`,
@@ -53,7 +57,9 @@ const putScheduleInDatabase = (userData, dataForSaveInDatabase) => {
           }
         }
       )
-        .catch(error => console.log(error) );
+      //.catch(error => console.log(error))
+
+
     } )
     .then(response => response);
   // .catch(error => console.log(error.message));
@@ -68,6 +74,7 @@ function getScheduleFromDatabase(email, password) {
 }
 
 function saveDataInLocalStorage(data, currentDate) {
+
   let rapportino = localStorage.getItem('rapportino');
 
   if (rapportino === null) localStorage.setItem('rapportino', '{}');
@@ -77,6 +84,7 @@ function saveDataInLocalStorage(data, currentDate) {
 	 } 
 
 function getRapportinoFromLocal() {
+  if(!localStorage.getItem('rapportino')) localStorage.setItem('rapportino', '{}');
   return localStorage.getItem('rapportino');
 }
 

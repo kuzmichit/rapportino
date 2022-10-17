@@ -9,8 +9,7 @@ export const calendarsElements = {
   textArea: calendar.querySelector('#desc'),
   placeToInsert: calendar.querySelector('.list__day'),
   listHour: calendar.querySelector('.list__hour'),
-  inputHour: calendar.querySelector('.input__hour'),
-  
+  inputHour: calendar.querySelector('.input__hour')
 };
 
 export function camellizeClass(nameClass) {
@@ -40,6 +39,7 @@ export function isUserDataInLocalStorage() {
   return localStorage.getItem('userData') ? true : false;
 }
 
-export function validate(str, expression = /^\w{6,}/) {
-  expression.test(str) ? true : false
-}
+export function isValid(str, regExp=/^\w{6,}$/) {
+  return regExp.test(str)?true:false        
+  }
+
